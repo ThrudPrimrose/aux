@@ -105,8 +105,9 @@ def calc_good_and_bad_cuts(connect, clustering, partition):
                 if neighbors_found == 4:
                     continue
 
-        print('\x1b[1A' + '\x1b[2K\r')
-        print(str(num1) + " / " + str(size), end='')
+        if num1 % 200 == 0:
+            #print('\x1b[1A' + '\x1b[2K\r')
+            print(str(num1) + " / " + str(size), end='')
 
     return (good_cut, bad_cut)
 
