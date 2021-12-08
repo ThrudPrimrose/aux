@@ -3,6 +3,9 @@
 #include <vector>
 #include <H5Cpp.h>
 #include <atomic>
+#include <sstream>
+#include <cstdlib>
+#include <algorithm>
 
 std::vector<int32_t> read_32(std::string& filename, std::string& dspacename)
 {
@@ -117,12 +120,141 @@ bool neighbors(int64_t v1, int64_t v2, int64_t v3, int64_t v4, int64_t w1, int64
     return false;
 }
 
+template <typename T>
+struct atomicwr
+{
+  std::atomic<T> _a;
+
+  atomicwr() noexcept
+    :_a(0)
+  {}
+
+  atomicwr(const std::atomic<T> &a) noexcept
+    :_a(a.load())
+  {}
+
+  atomicwr(const atomicwr &other) noexcept
+    :_a(other._a.load())
+  {}
+
+  atomicwr(atomicwr &&other)
+    :_a(other._a.load())
+  {}
+
+  T load() const noexcept
+  {
+      return _a.load();
+  }
+
+  atomicwr &operator=(const atomicwr &other) noexcept
+  {
+    _a.store(other._a.load());
+  }
+
+  atomicwr &operator=(atomicwr &&other) noexcept
+  {
+    _a.store(other._a.load());
+  }
+
+  bool operator<(const atomicwr& other) const noexcept
+  {
+      return _a.load() < other.load();
+  }
+
+  bool operator>(const atomicwr& other) const noexcept
+  {
+      return _a.load() > other.load();
+  }
+
+  bool operator==(const atomicwr& other) const noexcept
+  {
+      return _a.load() == other.load();
+  }
+
+  atomicwr& operator++() noexcept
+  {
+    _a++;
+    return *this;
+  }
+
+atomicwr& operator++(int) noexcept
+  {
+    _a++;
+    return *this;
+  }
+};
+
+
+void print_matrix(const std::vector<std::vector<atomicwr<unsigned int>>>& vec)
+{
+    std::vector<unsigned int> row_max;
+    for (const auto& row : vec)
+    {
+        row_max.push_back(std::max_element(row.begin(), row.end())->load());
+    }
+
+    unsigned int glob_max = *std::max_element(row_max.begin(), row_max.end());
+
+    size_t digits = std::to_string(glob_max).size();
+
+    std::stringstream ss;
+
+    ss << "Communication volume: {" << std::endl;
+    for (size_t i = 0; i< vec.size(); i++)
+    {
+        ss << "  {";
+        for(size_t j = 0; j < vec[i].size() - 1; j++)
+        {
+            unsigned int el = vec[i][j].load();
+            size_t local_digits = std::to_string(el).size();
+
+            size_t padding = digits - local_digits;
+
+            for(size_t k =0; k<padding+1; k++)
+            {
+                ss << " ";
+            }
+
+            ss << el;
+            ss << ",";
+        }
+            
+        unsigned int el = vec[i][vec[i].size() - 1].load();
+        size_t local_digits = std::to_string(el).size();
+
+        size_t padding = digits - local_digits;
+
+        for(size_t k =0; k<padding+1; k++)
+        {
+            ss << " ";
+        }
+
+        ss << el;
+        ss << "}" << std::endl;
+    }
+    ss << "}";
+    std::cout << ss.str() << std::endl;
+}
+
 int main(int argc, char** argv)
 {
     std::string fn = argv[1];
+    std::cout << fn << std::endl;
+    unsigned int rank = std::atoi(argv[2]);
+    std::cout << rank << std::endl;
     std::string name = "/mesh0/clustering";
     std::string conn = "/mesh0/connect";
     std::string part = "/mesh0/partition";
+
+    std::vector<std::vector<atomicwr<unsigned int>>> communication_area;
+
+    for(unsigned int i = 0; i < rank; i++)
+    {
+        std::vector<atomicwr<unsigned int>> r(rank);
+        communication_area.push_back(std::move(r));
+    }
+
+    // print_matrix(communication_area);
 
     std::vector<int32_t> vec1 = read_32(fn, name);
     //first 4 elements are of element 1 and 4..8 are from element 2
@@ -163,21 +295,24 @@ int main(int argc, char** argv)
             {
                 neighbor_count += 1;
 
-                //std::cout << "(" << v1 << ", " << v2 << ", " << v3 << ", " << v4 << ") and (" << w1 << ", " << w2 << ", " << w3 << ", " << w4 << ") are neighbors" << std::endl; 
+                // std::cout << "(" << v1 << ", " << v2 << ", " << v3 << ", " << v4 << ") and (" << w1 << ", " << w2 << ", " << w3 << ", " << w4 << ") are neighbors" << std::endl; 
                 // different rank
-                //std::cout << vec3[i] << ", " << vec3[j] << std::endl;
+                // std::cout << vec3[i] << ", " << vec3[j] << std::endl;
                 if (vec3[i] != vec3[j])
                 {
-                    //same time cluster
-                    //std::cout << vec1[i] << ", " << vec1[j] << std::endl;
+                    // same time cluster
+                    // std::cout << vec1[i] << ", " << vec1[j] << std::endl;
                     if (vec1[i] == vec1[j])
                     {
                         good_cuts++;
                     }else{
-                    //different time cluster
+                    // different time cluster
                         bad_cuts++;
                     }
                 }
+
+                
+                communication_area[vec3[i]][vec3[j]]++;
             }
 
             if (neighbor_count == 4)
@@ -188,4 +323,6 @@ int main(int argc, char** argv)
     }
 
     std::cout << "good cuts: " << good_cuts << ", " << "bad cuts: " << bad_cuts << std::endl;
+
+    print_matrix(communication_area);
 }
