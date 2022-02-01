@@ -1,0 +1,3 @@
+/home/primrose/work/aux/human_instrumentality_project/build/CMakeFiles/rebuild_cache.dir
+/home/primrose/work/aux/human_instrumentality_project/build/CMakeFiles/edit_cache.dir
+/home/primrose/work/aux/human_instrumentality_project/build/CMakeFiles/hip.dir
