@@ -16,7 +16,7 @@ cd build
 #JOBTYPES is readas an environment variable, the user has to make sure that the needed joytypes are compiled!!!!
 #no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
 
-cmake ..
+cmake .. \
 -DCMAKE_C_COMPILER=mpiicc \
 -DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
@@ -46,7 +46,7 @@ mv pond ../pond-static
 
 rm -r *
 
-cmake .
+cmake .. \
 -DCMAKE_C_COMPILER=mpiicc \
 -DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
@@ -76,7 +76,7 @@ mv pond ../pond-local-random
 
 rm -r *
 
-cmake ..
+cmake .. \
 -DCMAKE_C_COMPILER=mpiicc \
 -DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
@@ -106,7 +106,7 @@ mv pond ../pond-local-busy
 
 rm -r *
 
-cmake ..
+cmake .. \
 -DCMAKE_C_COMPILER=mpiicc \
 -DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
@@ -136,7 +136,7 @@ mv pond ../pond-global-random
 
 rm -r *
 
-cmake ..
+cmake .. \
 -DCMAKE_C_COMPILER=mpiicc \
 -DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
