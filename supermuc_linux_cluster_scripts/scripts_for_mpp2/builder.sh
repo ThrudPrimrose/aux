@@ -1,109 +1,168 @@
 #!/bin/bash
 
 #script for building and copying right executables
-#~/upcxx-intel
+#~/upcxx-intel-mpp2
 
-module load cmake/3.16.5
-module load netcdf-hdf5-all/4.7_hdf5-1.10-intel19-serial
-module load metis/5.1.0-intel19-i64-r64
+module load cmake
+module unload intel-mpi/2019-intel
+module unload intel-oneapi-compilers/2021.4.0
+module load intel-oneapi-compilers/2022.0.1
+module load intel-oneapi-mpi/2021-intel
+module load metis
 
-
-make clean
-rm CMakeCache.txt
-rm -r CMakeFiles
-rm cmake_install.cmake
-rm Makefile
+mkdir build
+cd build 
 
 #JOBTYPES is readas an environment variable, the user has to make sure that the needed joytypes are compiled!!!!
-
 #no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
 
-#no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=2 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=OFF
+cmake ..
+-DCMAKE_C_COMPILER=mpicc \
+-DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+-DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
+-DENABLE_FILE_OUTPUT=OFF \
+-DBUILD_RELEASE=ON \
+-DENABLE_O3_UPCXX_BACKEND=ON \
+-DENABLE_MEMORY_SANITATION=OFF \
+-DIS_CROSS_COMPILING=OFF \
+-DINVASION=ON \
+-DTIME=OFF \
+-DTRACE=OFF \
+-DMIGRATION=0 \
+-DREPORT_MAIN_ACTIONS=OFF \
+-DTHREAD_SANITIZER=OFF 
+-DLAZY_ACTIVATION=ON 
+-DANALYZE=OFF 
+-DINTERRUPT=OFF \
+-DSTEAL_ONLY_ACTABLE_ACTOR=OFF \
+-DSTEAL_FROM_BUSY_RANK=OFF \
+-DGLOBAL_MIGRATION=OFF \
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-steal
+make -j actorlib 
+make -j pond 
+mv pond ../pond-static
 
+rm -r *
 
-#no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=0 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=ON
+cmake .
+-DCMAKE_C_COMPILER=mpicc \
+-DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+-DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
+-DENABLE_FILE_OUTPUT=OFF \
+-DBUILD_RELEASE=ON \
+-DENABLE_O3_UPCXX_BACKEND=ON \
+-DENABLE_MEMORY_SANITATION=OFF \
+-DIS_CROSS_COMPILING=OFF \
+-DINVASION=ON \
+-DTIME=OFF \
+-DTRACE=OFF \
+-DMIGRATION=1 \
+-DREPORT_MAIN_ACTIONS=OFF \
+-DTHREAD_SANITIZER=OFF 
+-DLAZY_ACTIVATION=ON 
+-DANALYZE=OFF 
+-DINTERRUPT=OFF \
+-DSTEAL_ONLY_ACTABLE_ACTOR=ON \
+-DSTEAL_FROM_BUSY_RANK=OFF \
+-DGLOBAL_MIGRATION=OFF \
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-lazy
+make -j actorlib 
+make -j pond 
+mv pond ../pond-local-random
 
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=1 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=OFF
+rm -r *
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-bulk
+cmake ..
+-DCMAKE_C_COMPILER=mpicc \
+-DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+-DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
+-DENABLE_FILE_OUTPUT=OFF \
+-DBUILD_RELEASE=ON \
+-DENABLE_O3_UPCXX_BACKEND=ON \
+-DENABLE_MEMORY_SANITATION=OFF \
+-DIS_CROSS_COMPILING=OFF \
+-DINVASION=ON \
+-DTIME=OFF \
+-DTRACE=OFF \
+-DMIGRATION=1 \
+-DREPORT_MAIN_ACTIONS=OFF \
+-DTHREAD_SANITIZER=OFF 
+-DLAZY_ACTIVATION=ON 
+-DANALYZE=OFF 
+-DINTERRUPT=OFF \
+-DSTEAL_ONLY_ACTABLE_ACTOR=ON \
+-DSTEAL_FROM_BUSY_RANK=ON \
+-DGLOBAL_MIGRATION=OFF \
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-#no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=1 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=ON
+make -j actorlib 
+make -j pond 
+mv pond ../pond-local-busy
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-bulklazy
+rm -r *
 
-#no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=0 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=OFF
+cmake ..
+-DCMAKE_C_COMPILER=mpicc \
+-DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+-DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
+-DENABLE_FILE_OUTPUT=OFF \
+-DBUILD_RELEASE=ON \
+-DENABLE_O3_UPCXX_BACKEND=ON \
+-DENABLE_MEMORY_SANITATION=OFF \
+-DIS_CROSS_COMPILING=OFF \
+-DINVASION=ON \
+-DTIME=OFF \
+-DTRACE=OFF \
+-DMIGRATION=1 \
+-DREPORT_MAIN_ACTIONS=OFF \
+-DTHREAD_SANITIZER=OFF 
+-DLAZY_ACTIVATION=ON 
+-DANALYZE=OFF 
+-DINTERRUPT=OFF \
+-DSTEAL_ONLY_ACTABLE_ACTOR=ON \
+-DSTEAL_FROM_BUSY_RANK=OFF \
+-DGLOBAL_MIGRATION=ON \
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-static
+make -j actorlib 
+make -j pond 
+mv pond ../pond-global-random
 
-#no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=2 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=ON
+rm -r *
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-steallazy
+cmake ..
+-DCMAKE_C_COMPILER=mpicc \
+-DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+-DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
+-DENABLE_FILE_OUTPUT=OFF \ 
+-DBUILD_RELEASE=ON \
+-DENABLE_O3_UPCXX_BACKEND=ON \
+-DENABLE_MEMORY_SANITATION=OFF \
+-DIS_CROSS_COMPILING=OFF \
+-DINVASION=ON \
+-DTIME=OFF \
+-DTRACE=OFF \
+-DMIGRATION=1 \
+-DREPORT_MAIN_ACTIONS=OFF \
+-DTHREAD_SANITIZER=OFF 
+-DLAZY_ACTIVATION=ON 
+-DANALYZE=OFF 
+-DINTERRUPT=OFF \
+-DSTEAL_ONLY_ACTABLE_ACTOR=ON \
+-DSTEAL_FROM_BUSY_RANK=ON \
+-DGLOBAL_MIGRATION=ON \
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-#no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=3 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=OFF
+make -j actorlib 
+make -j pond 
+mv pond ../pond-global-busy
 
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-hybrid
-
-cmake . -DCMAKE_C_COMPILER=mpiicc -DCMAKE_CXX_COMPILER=mpiicpc -DCMAKE_PREFIX_PATH=${UPCXX_INSTALL} -DENABLE_FILE_OUTPUT=OFF -DBUILD_RELEASE=ON \
--DENABLE_LOGGING=OFF -DENABLE_O3_UPCXX_BACKEND=ON -DENABLE_PARALLEL_UPCXX_BACKEND=OFF -DENABLE_MEMORY_SANITATION=OFF -DIS_CROSS_COMPILING=OFF \
--DINVASION=OFF -DTIME=OFF -DANALYZE=OFF -DTRACE=OFF -DMIGRATION=3 -DREPORT_MAIN_ACTIONS=OFF \
--DGLOBAL_MIGRATION=OFF -DLAZY_ACTIVATION=ON
-
-make actorlib -j 16
-make pond -j 16
-#pond-* should be same as pond-${jobtypes[@]} that is an environment variable
-mv pond pond-hybridlazy
-
-
-
+rm -r *
+cd ..
