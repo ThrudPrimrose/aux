@@ -17,8 +17,8 @@ cd build
 #no loop for joytypes here because every job type will have a different set of arguments so, copy by yourself
 
 cmake ..
--DCMAKE_C_COMPILER=mpicc \
--DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_C_COMPILER=mpiicc \
+-DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
 -DENABLE_FILE_OUTPUT=OFF \
@@ -47,8 +47,8 @@ mv pond ../pond-static
 rm -r *
 
 cmake .
--DCMAKE_C_COMPILER=mpicc \
--DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_C_COMPILER=mpiicc \
+-DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
 -DENABLE_FILE_OUTPUT=OFF \
@@ -77,8 +77,8 @@ mv pond ../pond-local-random
 rm -r *
 
 cmake ..
--DCMAKE_C_COMPILER=mpicc \
--DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_C_COMPILER=mpiicc \
+-DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
 -DENABLE_FILE_OUTPUT=OFF \
@@ -107,8 +107,8 @@ mv pond ../pond-local-busy
 rm -r *
 
 cmake ..
--DCMAKE_C_COMPILER=mpicc \
--DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_C_COMPILER=mpiicc \
+-DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
 -DENABLE_FILE_OUTPUT=OFF \
@@ -137,8 +137,8 @@ mv pond ../pond-global-random
 rm -r *
 
 cmake ..
--DCMAKE_C_COMPILER=mpicc \
--DCMAKE_CXX_COMPILER=mpicxx \
+-DCMAKE_C_COMPILER=mpiicc \
+-DCMAKE_CXX_COMPILER=mpiicpc \
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_PREFIX_PATH=~/upcxx-intel-mpp2 
 -DENABLE_FILE_OUTPUT=OFF \ 
