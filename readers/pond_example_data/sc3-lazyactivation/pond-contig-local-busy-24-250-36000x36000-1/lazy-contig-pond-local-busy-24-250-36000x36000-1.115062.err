@@ -1,0 +1,45 @@
+WARNING: ODP disabled on 672 of 672 processes which are missing support.
+         To suppress this message set environment variable
+         GASNET_ODP_VERBOSE=0 or reconfigure with --disable-ibv-odp
+         (see ibv-conduit's README for more information).
+         To see additional details set environment variable
+         GASNET_ODP_VERBOSE=2 (or higher).
+Config: Print gitter output: 1
+Config: Can steal during termination (when graph partially terminated): 0
+Config: Checkpoint output: 1
+Config: Cooldown between steal tries and attempts: 1
+Config: Additional barrier after checkpoint output: 0
+Config: Steal only neighboring actors (local)
+Config: Steal from the busiest of the allowed ranks (busy)
+Config: UPCXX codemode: undefined
+Config: Going away limit is: 1
+Config: Order victims: 0
+Config: Contigious migration: 0
+Config: Using time spent in act() as the base for migration.
+Config: Not using actor triggers
+Config: Using rma to exchange task info.
+Config: Use synchronized calls during init: 0
+slurmstepd: error: *** JOB 115062 ON i22r04c01s02 CANCELLED AT 2022-08-03T18:59:53 DUE TO TIME LIMIT ***
+--------------------------------------------------------------------------
+ORTE has lost communication with a remote daemon.
+
+  HNP daemon   : [[29269,0],0] on node i22r04c01s02
+  Remote daemon: [[29269,0],2] on node i22r04c04s06
+
+This is usually due to either a failure of the TCP network
+connection to the node, or possibly an internal failure of
+the daemon itself. We cannot recover from this failure, and
+therefore will terminate the job.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 17 in communicator MPI COMMUNICATOR 3 CREATE FROM 0
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+mpirun: abort is already in progress...hit ctrl-c again to forcibly terminate
+
+mpirun: Forwarding signal 18 to job
+[i22r04c01s02:19297:0:19297] Caught signal 11 (Segmentation fault: address not mapped to object at address 0x30)

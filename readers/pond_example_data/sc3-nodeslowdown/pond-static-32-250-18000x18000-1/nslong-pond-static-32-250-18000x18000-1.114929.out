@@ -1,0 +1,8 @@
+#### POND Configuration ####
+Total Grid Size:          18000x18000 = 324000000 cells. (x*y)
+Patch Size:               250x250
+Number of checkpoints:    10
+File name Prefix:         /gpfs/scratch/pr63so/ge69xij2/sc3-nodeslowdown-newimplementation/pond-static-32-250-18000x18000-1/out/out
+Scenario simulation area: {X: 0.000 - 100.000, Y: 0.000 - 100.000}
+Cell Size:                0.00555556m * 0.00555556m (dx * dy)
+#### POND Configuration ####

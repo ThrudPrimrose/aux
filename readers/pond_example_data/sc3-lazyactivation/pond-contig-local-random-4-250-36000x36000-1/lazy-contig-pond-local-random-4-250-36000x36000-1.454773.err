@@ -1,0 +1,21 @@
+WARNING: ODP disabled on 112 of 112 processes which are missing support.
+         To suppress this message set environment variable
+         GASNET_ODP_VERBOSE=0 or reconfigure with --disable-ibv-odp
+         (see ibv-conduit's README for more information).
+         To see additional details set environment variable
+         GASNET_ODP_VERBOSE=2 (or higher).
+Config: Print gitter output: 1
+Config: Can steal during termination (when graph partially terminated): 0
+Config: Checkpoint output: 1
+Config: Cooldown between steal tries and attempts: 1
+Config: Additional barrier after checkpoint output: 0
+Config: Steal only neighboring actors (local)
+Config: Steal randomly (random)
+Config: UPCXX codemode: undefined
+Config: Going away limit is: 1
+Config: Order victims: 0
+Config: Contigious migration: 1
+Config: Using time spent in act as the base for migration.
+Config: Not using actor triggers
+Config: Using rma to exchange task info.
+Config: Use synchronized calls during init: 0
