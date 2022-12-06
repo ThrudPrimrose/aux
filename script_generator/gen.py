@@ -6,12 +6,19 @@ case_name = "StrongScaling"
 
 # Update this variable depending on the run time of a small job
 # e.g. 2D Cavity without output for
-# 1 Node for 100x100 w. final time 10 takes 35 seconds
-core_base_time = 50
+# 1 Node for 100x100 w. final time 1 takes 6 seconds
+core_base_time = 10
+
+
+# time function, 
+# quadratic fit {{1, 6}, {4, 30}, {9, 90}, {16, 330}}
+# least squares best fit
+# 1.50182 x^2 - 4.34545 x + 13.68
+# lets use 2x*2 depending on the 1 dimension of the square
 
 # For strong scaling let's run a job of end time 20,
-# and 1000x1000 on 10, 5x5 for each dimension 2 for doubling end time
-base_time = core_base_time*10*10*2
+# and 500x500 on 10, 5x5 for each dimension 2 for doubling end time
+base_time = core_base_time*2*((5*5)^2)*10
 
 def convert_seconds_to_string(seconds):
     hours = str(seconds // 3600)
