@@ -5,9 +5,9 @@ nodecounts = ["1", "2", "4", "8", "16", "24", "32"]
 nodecountsint = [1, 2, 4, 8, 16, 24, 32]
 nodecountlabels = ["1", "2", "4", "8", "16", "24", "32"]
 
-# nodecounts = ["1", "2", "4", "8", "16", "32"]
-# nodecountsint = [1, 2, 4, 8, 16,  32]
-# nodecountlabels = ["1", "2", "4", "8", "16", "32"]
+#nodecounts = ["1", "2", "4", "8", "16", "32"]
+#nodecountsint = [1, 2, 4, 8, 16,  32]
+#nodecountlabels = ["1", "2", "4", "8", "16", "32"]
 
 xticks = nodecounts
 
@@ -23,17 +23,23 @@ xticks = nodecounts
 #            "local-random", "local-busy"]
 # yyy = 62
 
-basepaths = ["sc3-lazyactivation"]
-static_job_name = "static"
-jobtypes = ["static", "global-random", "global-busy",
-            "contig-local-random", "contig-local-busy", "offload-local-single"]
-yyy = 52
+#basepaths = ["pond_example_data/sc3-lazyactivation"]
+#static_job_name = "static"
+#jobtypes = ["static", "global-random", "global-busy",
+#            "contig-local-random", "contig-local-busy", "offload-local-single"]
+#yyy = 52
 
-#basepaths = ["sc3-nodeslowdown"]
+#basepaths = ["pond_example_data/sc3-nodeslowdown"]
 #static_job_name = "sw-static"
 #jobtypes = ["sw-static", "sw-global-random", "sw-global-busy",
 #            "sw-local-random", "sw-local-busy", "sw-offload-local-single"]
 #yyy = 32
+
+basepaths = ["pond_example_data/sc3-staticworkload"]
+static_job_name = "sw-static"
+jobtypes = ["sw-static", "sw-global-random", "sw-global-busy",
+            "sw-local-random", "sw-local-busy", "sw-offload-local-single"]
+yyy = 32
 
 defined_colors = ["purple", "orangered", "yellowgreen",
                   "orange", "mediumturquoise", "palevioletred", "lightsteelblue", "thistle",

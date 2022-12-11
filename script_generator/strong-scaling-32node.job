@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH -J strong-scaling-32node
+#SBATCH -o %x.%j.out
+#SBATCH -e %x.%j.err
+#SBATCH -D ./
+#SBATCH --mail-type=end,fail,timeout
+#SBATCH --mail-user=yakup.paradox@gmail.com
+#SBATCH --time=00:10:00
+#SBATCH --no-requeue
+#SBATCH --export=NONE
+#SBATCH --get-user-env
+#SBATCH --clusters=cm2
+#SBATCH --qos=cm2_large
+#SBATCH --partition=cm2_large
+#SBATCH --nodes=32
+#SBATCH --ntasks-per-node=28
+
+module load slurm_setup
+module unload intel-mpi/2019-intel
+module unload intel-oneapi-compilers/2021.4.0
+module unload intel-mkl/2020
+module load cmake
+module load gcc/11
+module load petsc/3.17.2-gcc11-ompi-real
+module load openmpi/4.1.2-gcc11
+
+mpirun -n 896 ${HOME}/ns-eof/build/NS-EOF-Runner \
+    ${HOME}/runs/Cavity2D-32node.xml

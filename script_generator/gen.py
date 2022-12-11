@@ -7,7 +7,7 @@ case_name = "StrongScaling"
 # Update this variable depending on the run time of a small job
 # e.g. 2D Cavity without output for
 # 1 Node for 100x100 w. final time 1 takes 6 seconds
-core_base_time = 10
+core_base_time = 6
 
 
 # time function, 
@@ -17,8 +17,8 @@ core_base_time = 10
 # lets use 2x*2 depending on the 1 dimension of the square
 
 # For strong scaling let's run a job of end time 20,
-# and 500x500 on 10, 5x5 for each dimension 2 for doubling end time
-base_time = core_base_time*2*((5*5)^2)*10
+# and 400x400 on 10, 5x5 for each dimension 2 for doubling end time
+base_time = core_base_time*2*((2*20)**2)*1.5
 
 def convert_seconds_to_string(seconds):
     hours = str(seconds // 3600)
@@ -36,32 +36,35 @@ def convert_seconds_to_string(seconds):
     return f"{hours}:{minutes}:{seconds}"
 
 for node_count in node_counts:
-    job_xml_name = f"Cavity2D-{node_count}node"
+    job_xml_name = f"Channel2D-{node_count}node"
     xml_string = f"""<?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="500" />
-    <simulation finalTime="20" >
+    <flow Re="100" />
+    <simulation finalTime="0.5" >
         <type>dns</type>
-        <scenario>cavity</scenario>
+        <scenario>channel</scenario>
     </simulation>
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />
-    <geometry dim="2"
-      lengthX="1.0" lengthY="1.0" lengthZ="1.0"
-      sizeX="1000" sizeY="1000" sizeZ="20"
+    <geometry
+      dim="2"
+      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      sizeX="1500" sizeY="200" sizeZ="10"
+      stretchX="false" stretchY="true" stretchZ="true"
     >
       <mesh>uniform</mesh>
+      <!--mesh>stretched</mesh-->
     </geometry>
     <environment gx="0" gy="0" gz="0" />
     <walls>
         <left>
-            <vector x="0" y="0" z="0" />
+            <vector x="1.0" y="0" z="0" />
         </left>
         <right>
             <vector x="0" y="0" z="0" />
         </right>
         <top>
-            <vector x="1" y="0" z="0" />
+            <vector x="0.0" y="0." z="0." />
         </top>
         <bottom>
             <vector x="0" y="0" z="0" />
@@ -73,9 +76,9 @@ for node_count in node_counts:
             <vector x="0" y="0" z="0" />
         </back>
     </walls>
-    <vtk interval="2147483647">Cavity2D</vtk>
-    <stdOut interval="2147483647" />
-    <parallel numProcessorsX="{node_count}" numProcessorsY="{core_count_per_node}" numProcessorsZ="1" />
+    <vtk interval="0.1">Channel2D</vtk>
+    <stdOut interval="0.0001" />
+    <parallel numProcessorsX="{core_count_per_node * node_count}" numProcessorsY="1" numProcessorsZ="1" />
 </configuration>
 """
 

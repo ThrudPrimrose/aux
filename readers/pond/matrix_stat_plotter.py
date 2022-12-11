@@ -1,6 +1,8 @@
 import seaborn as sns
 import numpy as np
-import matplotlib.pylab as plt
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.backends.backend_pdf
 from enum import Enum
 import os
 
@@ -320,20 +322,28 @@ def generate_two_sample_plots():
 
             max_sample_end = np.max(max_samples)
             min_sample_end = np.min(max_samples)
-            right_sample = max(int(min_sample_end * 0.7), 1)
+            right_sample = max(int(min_sample_end * 0.7), 0)
             print(jobtypes)
-            print(nodecount, ": ", max_samples, " and ", min_sample_end, ", right sample: ", right_sample)
+            print(nodecount, ": ", max_samples, " and ", min_sample_end, ", right sample: ", right_sample, " and left sample: 0")
             y_max = 0.0
 
             print(len(all_samples), ", ", len(jobtypes))
 
-            i = 0
-            for job in jobtypes:
-                # Gather maximal y values for y limit
-                y_maxes[2*i] = -np.sort(-all_samples[i][0, :])[0]
-                y_maxes[2*i+1] = -np.sort(-all_samples[i][right_sample, :])[0]
-                i += 1
-            i = 0
+            if (min_sample_end != 0.0):
+                i = 0
+                for job in jobtypes:
+                    # Gather maximal y values for y limit
+                    print(len(all_samples[i]))
+                    print(all_samples[i])
+                    if len(all_samples[i]) == 1:#
+                        print(all_samples[i])
+                        y_maxes[2*i] = -np.sort(-all_samples[i][0])[0]
+                        y_maxes[2*i+1] = -np.sort(-all_samples[i][0])[0]
+                    else:
+                        y_maxes[2*i] = -np.sort(-all_samples[i][0, :])[0]
+                        y_maxes[2*i+1] = -np.sort(-all_samples[i][right_sample, :])[0]
+                    i += 1
+                i = 0
 
             print("Y-maxes: ", y_maxes)
             y_max_inds = np.amax(y_maxes)
@@ -348,13 +358,18 @@ def generate_two_sample_plots():
                 i += 1
             i = 0
 
-            i = 0
             for job in jobtypes:
                 #print("Sample shape: ", all_samples[i].shape)
                 #print("Sample left: ", all_samples[i][0, :])
                 #print("Sample right: ", all_samples[i][right_sample, :])
-                sleft = -np.sort(-all_samples[i][0, :])
-                sright = -np.sort(-all_samples[i][right_sample, :])
+                if len(all_samples[i]) == 1:#
+                    continue
+                else:
+                    sleft = -np.sort(-all_samples[i][0, :])
+                    sright = -np.sort(-all_samples[i][right_sample, :])
+                
+                #sleft = -np.sort(-all_samples[i][0, :])
+                #sright = -np.sort(-all_samples[i][right_sample, :])
                 #print("Sample left (desc): ", sleft)
                 #print("Sample right (desc): ", sright)
 
@@ -378,9 +393,201 @@ def generate_two_sample_plots():
                         "-two-sample" + ".pdf", bbox_inches='tight')
 
 
+
+def generate_sample_plots_per_strategy(x_tick_visible=True, sample_count_visible=True, y_name_visible=True, x_name_visible=True):
+    for basepath in basepaths:
+        all_dirs = get_dirs(basepath)
+
+        with_x_tick = ""
+        with_sample_name = ""
+        with_yname = "" 
+        with_xname = ""
+        if x_tick_visible:
+            with_x_tick = "-with-xtick"
+        else:
+            with_x_tick = "-with-no-xtick"
+        if sample_count_visible:
+            with_sample_name = "-with-sample-name"
+        else:
+            with_sample_name = "-with-no-sample-name"
+        if y_name_visible:
+            with_yname = "-with-yname"
+        else:
+            with_yname = "-with-no-yname"
+        if x_name_visible:
+            with_xname = "-with-xname"
+        else:
+            with_xname = "-with-no-xname"
+
+        # 1 plot per nodecount to compare strategies
+        append_string = with_x_tick + with_sample_name + with_yname + with_xname
+        os.mkdir(basepath + "/../" + append_string)
+        outputbasepath = basepath + "/../" + append_string
+        for nodecount in nodecounts:
+            #plt.subplots_adjust(left=0.5, right=0.5, top=0.5, bottom=0.5)
+            #plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
+            #fig.text(-0.04, 0.5, 'Workload per rank',
+            #         va='center', rotation='vertical')
+            # Set labels
+
+            y_maxes = np.zeros(len(jobtypes)*2)
+            max_samples = np.zeros(len(jobtypes))
+            all_samples = []
+            rankids = np.array(list(range(0, int(nodecount)*28)))
+
+            i = 0
+            for job in jobtypes:
+                prefix = "pond-" + job + "-" + str(nodecount) + "-"
+                matching_dirs = filter_prefix(prefix, all_dirs)
+                # print(matching_dirs)
+                for dirname in matching_dirs:
+                    # print(name)
+                    outfiles = get_files(basepath + "/" + dirname)
+                    outfiles = filter_suffix(suffix, outfiles)
+                    outfiles.sort()
+
+                    # print(outfiles)
+                    if len(outfiles) > 0:
+                        filename = outfiles[-1]
+                        workloads = read_workload_at_checkpoint(
+                            basepath + "/" + dirname + "/" + filename, int(nodecount)*28, "24")
+                        if workloads.size != 0:
+                            rel_vars = []
+                            at = []
+
+                            j = 0
+                            for wl in workloads:
+                                rel_vars.append(np.var(wl) / np.mean(wl))
+                                at.append(str(j))
+                                j += 1
+
+                            #if job != "static" and job != "sw-static":
+                            if True:
+                                if j > max_samples[i]:
+                                    max_samples[i] = j
+                                    #print(max_x, " | ", job)
+
+                            # print(np.array(rel_vars).shape)
+                            # plt.plot(at, rel_vars, label=job)
+                        all_samples.append(workloads)
+                
+                i += 1
+            i = 0
+
+            max_sample_end = np.max(max_samples)
+            min_sample_end = np.min(max_samples)
+            right_sample = max(int(min_sample_end * 1.0)-1, 0)
+            print(jobtypes)
+            print(nodecount, ": ", max_samples, " and ", min_sample_end, ", right sample: ", right_sample, " and left sample: 0")
+            y_max = 0.0
+
+            print(len(all_samples), ", ", len(jobtypes))
+
+            if (min_sample_end != 0.0):
+                i = 0
+                for job in jobtypes:
+                    # Gather maximal y values for y limit
+                    #print(len(all_samples[i]))
+                    #print(all_samples[i])
+                    if len(all_samples[i]) == 1:#
+                        #print(all_samples[i])
+                        y_maxes[2*i] = -np.sort(-all_samples[i][0])[0]
+                        y_maxes[2*i+1] = -np.sort(-all_samples[i][0])[0]
+                    else:
+                        y_maxes[2*i] = -np.sort(-all_samples[i][0, :])[0]
+                        y_maxes[2*i+1] = -np.sort(-all_samples[i][right_sample, :])[0]
+                    i += 1
+                i = 0
+
+            print("Y-maxes: ", y_maxes)
+            y_max_inds = np.amax(y_maxes)
+            # print(y_max_inds)
+            y_max = y_max_inds
+            print("Y-max: ", y_max)
+
+            i = 0
+            for job in jobtypes:
+                #print("Sample shape: ", all_samples[i].shape)
+                #print("Sample left: ", all_samples[i][0, :])
+                #print("Sample right: ", all_samples[i][right_sample, :])
+                if len(all_samples[i]) == 1:#
+                        continue
+                else:
+                    sleft = -np.sort(-all_samples[i][0, :])
+                    sright = -np.sort(-all_samples[i][right_sample, :])
+
+                for (a, s)  in [(sleft, 0), (sright, right_sample)]:
+
+                    with matplotlib.backends.backend_pdf.PdfPages(outputbasepath + "/" + "static-workload-" + 
+                        job + "-nodes-" + str(nodecount) + 
+                        "-sample-" + str(s) + append_string + ".pdf") as pdf1:
+                        # Fresh start new plot
+                        plt.close()
+                        plt.figure()
+
+                        # 2 subplots for sample at time 0 and sample at time 'much later'
+                        # fig, axes = plt.subplots(len(jobtypes), 2)
+                        fig = plt.figure()
+                        plt.gcf().tight_layout()
+                        #sleft = -np.sort(-all_samples[i][0, :])
+                        #sright = -np.sort(-all_samples[i][right_sample, :])
+                        #print("Sample left (desc): ", sleft)
+                        #print("Sample right (desc): ", sright)
+
+                        plt.bar(rankids,
+                                    a,
+                                    color=color_dict[job_to_label[job]])
+                        
+                        plt.gca().set_ylim(
+                            top=y_max,
+                            bottom=0.0
+                        )
+
+                        if sample_count_visible:
+                            if x_name_visible:
+                                plt.gca().set_xlabel(
+                                    "Rank-id" + "\n \n" + " At " + str(s*180+180) + " seconds")
+                                plt.gcf().subplots_adjust(bottom=0.175)
+                            else:
+                                plt.gca().set_xlabel("")
+                        else: 
+                            if x_name_visible:
+                                plt.gca().set_xlabel("Rank-id")
+                                plt.gcf().subplots_adjust(bottom=0.125)
+                            else:
+                                plt.gca().set_xlabel("")
+
+                        if y_name_visible:
+                            plt.gca().set_ylabel(
+                                "Actor cost per rank")
+
+                        if not x_tick_visible:
+                            plt.gca().set_xticks([])
+
+                        plt.title(job_to_label[job])
+
+                        #plt.gca().get_xaxis().set_visible(False)
+
+                        pdf1.savefig()
+                        plt.close()
+                i += 1
+
 # generate_plots()
 # generate_line_plots()
-generate_two_sample_plots()
+#generate_two_sample_plots()
+#for i in [True, False]:
+#    for j in [True, False]:
+#        for k in [True, False]:
+#            for l in [True, False]:
+for i in [True]:
+    for j in [True]:
+        for k in [True]:
+            for l in [True]:
+                generate_sample_plots_per_strategy(
+                    x_tick_visible=i, 
+                    sample_count_visible=j, 
+                    y_name_visible=k,
+                    x_name_visible=l)
 
 """
 comm_mat = read_matrix("exmaple", "COMM_MATRIX BEGIN", "COMM_MATRIX END")
