@@ -1,2 +1,0 @@
-/usr/bin/ar qc libtarch_mimic.a CMakeFiles/tarch_mimic.dir/tarch_mimic.cpp.o CMakeFiles/tarch_mimic.dir/check.cu.o
-/usr/bin/ranlib libtarch_mimic.a

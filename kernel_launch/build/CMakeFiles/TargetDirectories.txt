@@ -1,4 +1,0 @@
-/home/primrose/Work/aux/kernel_launch/build/CMakeFiles/tarch_mimic.dir
-/home/primrose/Work/aux/kernel_launch/build/CMakeFiles/main.dir
-/home/primrose/Work/aux/kernel_launch/build/CMakeFiles/edit_cache.dir
-/home/primrose/Work/aux/kernel_launch/build/CMakeFiles/rebuild_cache.dir
