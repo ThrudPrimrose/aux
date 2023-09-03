@@ -1,0 +1,17 @@
+// HARDWARE BACKEND:
+// TODO: remove WITH_CUDA_API and use the compiler (nvhpc)'s prerocessor flag
+// Init GPU stuff check if GPUOffloading is defined
+// Also check if a kernel can be launched etc.
+// Dry-run, streaming benchmark
+
+
+// TODO: Transpose table
+// TODO:
+// TODO: rm, compute arch, shared, constant memory etc. (the lower level details)
+// TODO: dry-run check if we can run kernels before the simulation starts
+
+// CMAKE:
+// TODO: Allow makefile from the generated application's location to call make to make the target
+// TODO: Do not craete GeneratedSubdirectories.cmake if not CMake backend
+// TODO: Restrict search of build folder (one build folder)
+// TODO: instead of copying use symbolic links?

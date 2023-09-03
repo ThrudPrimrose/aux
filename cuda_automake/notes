@@ -1,0 +1,8 @@
+  // Something like this or returning a pointer an unconcretized autotuner etc.
+  //#ifdef _AUTOTUNING
+  //tarch::multicore::orchestration::
+  //  createDefaultStrategy();
+  //#else
+  //  TRY IT OUT
+  //#endif
+
