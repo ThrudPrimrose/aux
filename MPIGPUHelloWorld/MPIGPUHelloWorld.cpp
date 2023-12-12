@@ -1,0 +1,95 @@
+
+#include <cmath>
+#include <cstdio>
+#include <cuda_runtime.h>
+#include <mpi.h>
+#include <vector>
+
+int main(int argc, char** argv) {
+  MPI_Init(&argc, &argv);
+
+  int world_size, world_rank;
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+  printf("Hello from process (global) %d of %d\n", world_rank, world_size);
+
+  // Determine the type of split (in this case, by node)
+  int split_type = MPI_COMM_TYPE_SHARED;
+
+  // Split the communicator based per ComputeNode
+  MPI_Comm node_local;
+  MPI_Comm_split_type(MPI_COMM_WORLD, split_type, world_rank, MPI_INFO_NULL, &node_local);
+
+  // Get the rank and size of the new communicator
+  int node_local_size, node_local_rank;
+  MPI_Comm_size(node_local, &node_local_size);
+  MPI_Comm_rank(node_local, &node_local_rank);
+
+  // Print a message from each process in the new communicator
+  printf("Global Rank %d, Global Size %d | Node-Local Rank %d, Node-Local Size %d\n", world_rank, world_size, node_local_rank, node_local_size);
+
+  cudaError_t cuda_status = cudaSetDevice(0);
+
+  if (cuda_status != cudaSuccess) {
+    throw std::runtime_error("cudaSetDevice failed! CUDA cannot be initialized.");
+  }
+
+  // Get the number of available GPUs
+  int device_count = 0;
+  cuda_status      = cudaGetDeviceCount(&device_count);
+
+  if (device_count == 0 || cuda_status != cudaSuccess) {
+    throw std::runtime_error("No CUDA-compatible GPU device found.");
+  }
+
+  if (node_local_size != device_count) {
+    throw std::runtime_error("Number of Ranks in Node is not equal to the number of GPU Devices.");
+  }
+
+  cudaSetDevice(node_local_rank);
+
+  constexpr size_t   vector_size = 256;
+  std::vector<float> h_a_v(256, 1.0f);
+  std::vector<float> h_b_v(256, 0.0f);
+  std::vector<float> reduced_h_b_v(256, 0.0f);
+  float*             h_a         = h_a_v.data();
+  float*             h_b         = h_b_v.data();
+  float*             reduced_h_b = reduced_h_b_v.data();
+
+  // Allocate memory for vectors on GPU
+  float *d_a, *d_b, *d_result;
+  cudaMalloc((void**)&d_a, vector_size * sizeof(float));
+  cudaMalloc((void**)&d_b, vector_size * sizeof(float));
+
+  // Copy vectors from CPU to GPU
+  cudaMemcpy(d_a, h_a, vector_size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_b, h_b, vector_size * sizeof(float), cudaMemcpyHostToDevice);
+
+  // Launch CUDA kernel
+
+
+  // Copy result from GPU to CPU
+  cudaMemcpy(h_b, d_b, vector_size * sizeof(float), cudaMemcpyDeviceToHost);
+
+  // Sum results across MPI ranks
+  MPI_Reduce(reduced_h_b, h_b, vector_size, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  if (world_rank == 0) {
+    bool incorrect = false;
+    for (int i = 0; i < vector_size; i++) {
+      if (std::abs(h_a[i] - static_cast<float>(world_size)) > 0.1) {
+        incorrect = true;
+        break;
+      }
+    }
+    if (incorrect) {
+      throw std::runtime_error("Incorrect results after Reduction");
+    }
+  }
+
+
+  MPI_Finalize();
+
+  return 0;
+}
