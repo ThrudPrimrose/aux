@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
   }
 
   cudaSetDevice(node_local_rank);
+  CUDA_CHECK_ERROR();
 
   constexpr size_t vector_size = 256;
   std::vector<float> h_a_v(vector_size, 1.0f);
