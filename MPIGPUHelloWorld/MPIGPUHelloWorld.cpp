@@ -84,6 +84,7 @@ int main(int argc, char **argv) {
   // Copy vectors from CPU to GPU
   cudaMemcpy(d_a, h_a, vector_size * sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(d_b, h_b, vector_size * sizeof(float), cudaMemcpyHostToDevice);
+  CUDA_CHECK_ERROR();
 
   // Launch CUDA kernel
   vectorAddLauncher(d_a, d_b);
@@ -91,6 +92,7 @@ int main(int argc, char **argv) {
 
   // Copy result from GPU to CPU
   cudaMemcpy(h_b, d_b, vector_size * sizeof(float), cudaMemcpyDeviceToHost);
+  CUDA_CHECK_ERROR();
 
   // Sum results across MPI ranks
   MPI_Reduce(reduced_h_b, h_b, vector_size, MPI_FLOAT, MPI_SUM, 0,
@@ -105,7 +107,7 @@ int main(int argc, char **argv) {
         printf("Unreduced results at %d: is %.4f should be %.4f.\n", i, h_b[i],
                h_a[i]);
         incorrect = true;
-        // break;
+        break;
       }
     }
     if (incorrect) {
