@@ -5,6 +5,7 @@
 #include <mpi.h>
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 
 #define CUDA_CHECK_ERROR()                                                     \
   {                                                                            \
