@@ -86,6 +86,8 @@ int main(int argc, char** argv) {
     }
     if (incorrect) {
       throw std::runtime_error("Incorrect results after Reduction");
+    } else {
+      printf("Results correct after reduction.\n");
     }
   }
 
