@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(MPIGPUHelloWorld MPIGPUHelloWorld.cpp HelloWorldKernel.cu)
 
 target_compile_options(MPIGPUHelloWorld PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler -fPIC>)
-target_compile_options(MPIGPUHelloWorld PRIVATE -fPIC -fPIE)
+target_compile_options(MPIGPUHelloWorld PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fPIC -fPIE>)
 
 target_link_libraries(MPIGPUHelloWorld PRIVATE ${CUDA_LIBRARIES})
 target_include_directories(MPIGPUHelloWorld PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
