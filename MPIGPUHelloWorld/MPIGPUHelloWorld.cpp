@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   CUDA_CHECK_ERROR();
 
   // Sum results across MPI ranks
-  MPI_Reduce(reduced_h_b, h_b, vector_size, MPI_FLOAT, MPI_SUM, 0,
+  MPI_Reduce(h_b, reduced_h_b, vector_size, MPI_FLOAT, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
   if (world_rank == 0) {
