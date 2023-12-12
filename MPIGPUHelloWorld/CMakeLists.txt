@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(MPIGPUHelloWorld MPIGPUHelloWorld.cpp HelloWorldKernel.cu)
 
+set_target_properties(MPIGPUHelloWorld PROPERTIES CUDA_ARCHITECTURES 86)
+
 target_compile_options(MPIGPUHelloWorld PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler -fPIC>)
 target_compile_options(MPIGPUHelloWorld PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fPIC -fPIE>)
 
